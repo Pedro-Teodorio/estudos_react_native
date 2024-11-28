@@ -1,6 +1,7 @@
 import React, { Component, ReactNode } from "react";
-import { Button, FlatList, Image, ListRenderItem, ListRenderItemInfo, ScrollView, StyleSheet, Text, TextInput, View, } from "react-native";
-
+import { Button, FlatList, Image, ListRenderItem, ListRenderItemInfo, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View, } from "react-native";
+import { Picker } from '@react-native-picker/picker';
+import Slider from "@react-native-community/slider";
 /*  
 
 ! Aula 01 - Primeiro App
@@ -408,14 +409,45 @@ const styles = StyleSheet.create({
   }
 })
 ! Fim da Aula 10
-*/
-export default class App extends Component {
+
+! Aula 11 - Picker
+interface AppState {
+  pizzaIndex: number;
+  pizzas: {id: number, nome: string, preco: number}[];
+}
+export default class App extends Component<any,AppState> {
+  constructor(props: any) {
+    super(props);
+    this.state ={
+      pizzaIndex: 0,
+      pizzas:[
+        {id: 1, nome: "Calabresa", preco: 59.59},
+        {id: 2, nome: "Marguerita", preco: 45.59},
+        {id: 3, nome: "Portuguesa", preco: 80.99},
+        {id: 4, nome: "Frango com Catupiry", preco: 69.59},
+        {id: 5, nome: "Quatro Queijos", preco: 39.39}
+      ]
+    }
+  }
   render(): ReactNode {
-    return(
+    return (
       <View style={styles.container}>
         <Text style={styles.title}>Menu Pizzas</Text>
-        <Text style={styles.text}>Você escolheu: Pizza de calabresa</Text>
-        <Text style={styles.text}>R$ 59,59</Text>
+
+        <Picker 
+            style={styles.picker}
+            selectedValue={this.state.pizzaIndex}
+            onValueChange={(itemValue, _itemIndex) => this.setState({pizzaIndex: itemValue})}
+        >
+          {
+            this.state.pizzas.map((pizza,index) => {
+              return <Picker.Item key={index} label={pizza.nome} value={index} />
+            })
+          }
+        </Picker>
+        
+        <Text style={styles.text}>Você escolheu: {this.state.pizzas[this.state.pizzaIndex].nome}</Text>
+        <Text style={styles.text}>R$ {this.state.pizzas[this.state.pizzaIndex].preco}</Text>
       </View>
     )
   }
@@ -426,18 +458,267 @@ const styles = StyleSheet.create({
     backgroundColor: "#18181b",
     marginTop: 40,
   },
-  title:{
+  title: {
     color: "#f0f0f0",
     fontSize: 32,
     textAlign: "center",
     fontWeight: "bold"
   },
-  text:{
+  text: {
     color: "#f0f0f0",
     fontSize: 20,
     textAlign: "center",
     marginTop: 16
+  },
+  picker: {
+    width: "90%",
+    backgroundColor: "#3f3f46",
+    color: "#f0f0f0",
+    padding: 4,
+    borderRadius: 20,
+    margin: 16
   }
 
-})
 
+})
+! Fim da Aula 11
+
+! Aula 12 - Slider
+interface AppState {
+  value: number;
+}
+export default class App extends Component<any,AppState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      value: 0
+    }
+  }
+  render(): ReactNode {
+    return (
+      <View style={styles.container} >
+        <Slider
+          minimumValue={0}
+          maximumValue={100}
+          value={this.state.value}
+          onValueChange={(value) => this.setState({value})}
+          minimumTrackTintColor="#f0f0f0"
+          maximumTrackTintColor="#3f3f46"
+        />
+        <Text style={styles.text}>{this.state.value.toFixed(0)}</Text>
+      </View>
+    )
+  }
+}
+! Fim da Aula 12
+
+! Aula 13 - Switch
+interface AppState {
+  value: boolean;
+}
+export default class App extends Component<any, AppState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      value: false
+    }
+  }
+
+  render(): ReactNode {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Hello World</Text>
+        <Switch
+          value={this.state.value}
+          onValueChange={(value) => this.setState({value})}
+          thumbColor={this.state.value ? "#f0f0f0" : "#3f3f46"}
+          trackColor={{true: "#3f3f46", false: "#f0f0f0"}}
+        />
+
+        <Text style={styles.text}>{this.state.value ? "Ligado" : "Desligado"}</Text>
+      </View>
+    )
+  }
+}
+! Fim da Aula 13
+*/
+
+interface AppState {
+  nome: string;
+  idade: string;
+  sexo: { id: number, nome: string }[],
+  sexoIndex: number;
+  valueSlider: number;
+  valueSwitch: boolean;
+}
+export default class App extends Component<any, AppState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      nome: "",
+      idade: "",
+      sexo: [
+        { id: 1, nome: "Masculino" },
+        { id: 2, nome: "Feminino" },
+      ],
+      sexoIndex: 0,
+      valueSlider: 0,
+      valueSwitch: false
+    }
+    this.handleSubmit= this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(){
+    const { nome, idade, valueSlider } = this.state;
+
+    if (!nome || !idade || valueSlider === 0) {
+      alert("Preencha todos os campos corretamente");
+      return;
+    }
+    alert(`Nome: ${this.state.nome} 
+          \nIdade: ${this.state.idade} 
+          \nSexo: ${this.state.sexo[this.state.sexoIndex].nome} 
+          \nValor: ${this.state.valueSlider} 
+          \nEstudante: ${this.state.valueSwitch ? "Sim" : "Não"}`
+    )
+  }
+  render(): ReactNode {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}> Cadastro</Text>
+        <TextInput
+          placeholder="Digite seu nome"
+          placeholderTextColor="#f4f4f5"
+          style={styles.input}
+          onChangeText={(text) => this.setState({ nome: text })}
+          value={this.state.nome}
+        />
+        <TextInput
+          placeholder="Digite sua idade"
+          placeholderTextColor="#f4f4f5"
+          style={styles.input}
+          onChangeText={(text) => this.setState({ idade: text })}
+          value={this.state.idade.toString()}
+        />
+        <Picker
+          selectedValue={this.state.sexoIndex}
+          style={styles.picker}
+          onValueChange={(itemValue, _itemIndex) => this.setState({ sexoIndex: itemValue })}
+          dropdownIconColor={"#f4f4f5"}
+        >
+
+          {
+            this.state.sexo.map((sexo, index) => {
+              return <Picker.Item key={index} label={sexo.nome} value={index} />
+            })
+          }
+        </Picker>
+          <View style={styles.sliderContent}>
+          <Text style={styles.sliderText}>Limite: {this.state.valueSlider.toFixed(0)}</Text>
+                <Slider
+                minimumValue={0}
+                maximumValue={2000}
+                value={this.state.valueSlider}
+                onValueChange={(value) => this.setState({ valueSlider: value })}
+                minimumTrackTintColor="#f0f0f0"
+                maximumTrackTintColor="#3f3f46"
+                thumbTintColor="#f0f0f0"
+              />
+              
+          </View>
+      
+
+        <View style={styles.switchContent}>
+          <Text style={styles.switchText}>Estudante</Text>
+          <Switch
+            value={this.state.valueSwitch}
+            onValueChange={(value) => this.setState({ valueSwitch: value })}
+            thumbColor={this.state.valueSwitch ? "#f0f0f0" : "#3f3f46"}
+            trackColor={{ true: "#3f3f46", false: "#f0f0f0" }}
+          />
+        </View>
+          <Pressable style={styles.button} 
+          onPress={this.handleSubmit}>
+            <Text style={styles.switchText}>Cadastrar</Text>
+          </Pressable>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#18181b",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 40,
+
+  },
+  title: {
+    color: "#f0f0f0",
+    fontSize: 32,
+    textAlign: "center",
+    fontWeight: "bold"
+  },
+  text: {
+    color: "#f0f0f0",
+    fontSize: 20,
+    textAlign: "center",
+    marginTop: 16
+  },
+  input: {
+    width: "90%",
+    height: 52,
+    backgroundColor: "#3f3f46",
+    color: "#f0f0f0",
+    padding: 16,
+    borderRadius: 20,
+    margin: 16,
+  },
+  picker: {
+    width: "90%",
+    backgroundColor: "#3f3f46",
+    color: "#f0f0f0",
+    borderRadius: 20,
+    margin: 16
+  },
+  sliderContent: {
+    flex: 0,
+    width: "90%",
+    flexDirection: "column",
+    justifyContent: "center",
+
+  },
+  sliderText: {
+    color: "#f0f0f0",
+    fontSize: 16,
+  },
+
+  switchContent: {
+
+    borderRadius: 20,
+    flex: 0,
+    width: "90%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  switchText: {
+    color: "#f0f0f0",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  button: {
+    backgroundColor: "#3f3f46",
+    padding: 16,
+    borderRadius: 20,
+    width: "90%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 16
+  }
+
+
+
+})
